@@ -1,0 +1,124 @@
+services:
+  wordpress-dev:
+    image: wordpress:php8.3-apache
+    restart: unless-stopped
+    environment:
+      WORDPRESS_DB_HOST: db-dev:3306
+      WORDPRESS_DB_NAME: ${OZMD_DEV_DB_NAME:-wordpress}
+      WORDPRESS_DB_USER: ${OZMD_DEV_DB_USER:-wordpress}
+      WORDPRESS_DB_PASSWORD: ${OZMD_DEV_DB_PASSWORD:-wordpress-dev-only}
+      WORDPRESS_TABLE_PREFIX: ozmd_
+    ports:
+      - "${OZMD_DEV_PORT:-8085}:80"
+    volumes:
+      - wordpress_dev_html:/var/www/html
+      - ./wordpress/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro
+      - ../ozeki-markdown-documents:/var/www/html/wp-content/plugins/ozeki-markdown-documents:ro
+    depends_on:
+      db-dev:
+        condition: service_healthy
+    networks:
+      - dev
+
+  db-dev:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${OZMD_DEV_DB_NAME:-wordpress}
+      MARIADB_USER: ${OZMD_DEV_DB_USER:-wordpress}
+      MARIADB_PASSWORD: ${OZMD_DEV_DB_PASSWORD:-wordpress-dev-only}
+      MARIADB_ROOT_PASSWORD: ${OZMD_DEV_DB_ROOT_PASSWORD:-root-dev-only}
+    volumes:
+      - wordpress_dev_db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - dev
+
+  wp-cli-dev:
+    image: wordpress:cli-php8.3
+    profiles: ["cli"]
+    working_dir: /var/www/html
+    user: "33:33"
+    environment:
+      WORDPRESS_DB_HOST: db-dev:3306
+      WORDPRESS_DB_NAME: ${OZMD_DEV_DB_NAME:-wordpress}
+      WORDPRESS_DB_USER: ${OZMD_DEV_DB_USER:-wordpress}
+      WORDPRESS_DB_PASSWORD: ${OZMD_DEV_DB_PASSWORD:-wordpress-dev-only}
+    volumes:
+      - wordpress_dev_html:/var/www/html
+      - ../ozeki-markdown-documents:/var/www/html/wp-content/plugins/ozeki-markdown-documents:ro
+    depends_on:
+      db-dev:
+        condition: service_healthy
+    networks:
+      - dev
+
+  wordpress-ziptest:
+    image: wordpress:php8.3-apache
+    restart: unless-stopped
+    environment:
+      WORDPRESS_DB_HOST: db-ziptest:3306
+      WORDPRESS_DB_NAME: ${OZMD_ZIPTEST_DB_NAME:-wordpress}
+      WORDPRESS_DB_USER: ${OZMD_ZIPTEST_DB_USER:-wordpress}
+      WORDPRESS_DB_PASSWORD: ${OZMD_ZIPTEST_DB_PASSWORD:-wordpress-ziptest-only}
+      WORDPRESS_TABLE_PREFIX: ozmdzip_
+    ports:
+      - "${OZMD_ZIPTEST_PORT:-8086}:80"
+    volumes:
+      - wordpress_ziptest_html:/var/www/html
+      - ./wordpress/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro
+    depends_on:
+      db-ziptest:
+        condition: service_healthy
+    networks:
+      - ziptest
+
+  db-ziptest:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${OZMD_ZIPTEST_DB_NAME:-wordpress}
+      MARIADB_USER: ${OZMD_ZIPTEST_DB_USER:-wordpress}
+      MARIADB_PASSWORD: ${OZMD_ZIPTEST_DB_PASSWORD:-wordpress-ziptest-only}
+      MARIADB_ROOT_PASSWORD: ${OZMD_ZIPTEST_DB_ROOT_PASSWORD:-root-ziptest-only}
+    volumes:
+      - wordpress_ziptest_db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - ziptest
+
+  wp-cli-ziptest:
+    image: wordpress:cli-php8.3
+    profiles: ["cli"]
+    working_dir: /var/www/html
+    user: "33:33"
+    environment:
+      WORDPRESS_DB_HOST: db-ziptest:3306
+      WORDPRESS_DB_NAME: ${OZMD_ZIPTEST_DB_NAME:-wordpress}
+      WORDPRESS_DB_USER: ${OZMD_ZIPTEST_DB_USER:-wordpress}
+      WORDPRESS_DB_PASSWORD: ${OZMD_ZIPTEST_DB_PASSWORD:-wordpress-ziptest-only}
+    volumes:
+      - wordpress_ziptest_html:/var/www/html
+    depends_on:
+      db-ziptest:
+        condition: service_healthy
+    networks:
+      - ziptest
+
+volumes:
+  wordpress_dev_html:
+  wordpress_dev_db:
+  wordpress_ziptest_html:
+  wordpress_ziptest_db:
+
+networks:
+  dev:
+  ziptest:
