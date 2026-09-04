@@ -7,8 +7,8 @@ Documents.
 
 Two independent WordPress installations are provided:
 
-- Development: <http://localhost:8085>
-- ZIP test: <http://localhost:8086>
+- Development: <http://localhost:8087>
+- ZIP test: <http://localhost:8088>
 
 The development service bind-mounts the plugin source **read-only**. Changes in
 the local repository are visible immediately, but WordPress cannot delete or

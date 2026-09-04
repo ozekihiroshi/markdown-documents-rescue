@@ -9,7 +9,7 @@ services:
       WORDPRESS_DB_PASSWORD: ${OZMD_DEV_DB_PASSWORD:-wordpress-dev-only}
       WORDPRESS_TABLE_PREFIX: ozmd_
     ports:
-      - "${OZMD_DEV_PORT:-8085}:80"
+      - "${OZMD_DEV_PORT:-8087}:80"
     volumes:
       - wordpress_dev_html:/var/www/html
       - ./wordpress/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro
@@ -48,6 +48,7 @@ services:
       WORDPRESS_DB_NAME: ${OZMD_DEV_DB_NAME:-wordpress}
       WORDPRESS_DB_USER: ${OZMD_DEV_DB_USER:-wordpress}
       WORDPRESS_DB_PASSWORD: ${OZMD_DEV_DB_PASSWORD:-wordpress-dev-only}
+      WORDPRESS_TABLE_PREFIX: ozmd_
     volumes:
       - wordpress_dev_html:/var/www/html
       - ../ozeki-markdown-documents:/var/www/html/wp-content/plugins/ozeki-markdown-documents:ro
@@ -67,7 +68,7 @@ services:
       WORDPRESS_DB_PASSWORD: ${OZMD_ZIPTEST_DB_PASSWORD:-wordpress-ziptest-only}
       WORDPRESS_TABLE_PREFIX: ozmdzip_
     ports:
-      - "${OZMD_ZIPTEST_PORT:-8086}:80"
+      - "${OZMD_ZIPTEST_PORT:-8088}:80"
     volumes:
       - wordpress_ziptest_html:/var/www/html
       - ./wordpress/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro
@@ -105,6 +106,7 @@ services:
       WORDPRESS_DB_NAME: ${OZMD_ZIPTEST_DB_NAME:-wordpress}
       WORDPRESS_DB_USER: ${OZMD_ZIPTEST_DB_USER:-wordpress}
       WORDPRESS_DB_PASSWORD: ${OZMD_ZIPTEST_DB_PASSWORD:-wordpress-ziptest-only}
+      WORDPRESS_TABLE_PREFIX: ozmdzip_
     volumes:
       - wordpress_ziptest_html:/var/www/html
     depends_on:
